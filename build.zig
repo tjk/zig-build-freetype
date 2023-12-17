@@ -38,7 +38,10 @@ pub fn build(b: *std.Build) !void {
         "-fno-sanitize=undefined",
     });
     if (libpng_enabled) try flags.append("-DFT_CONFIG_OPTION_USE_PNG=1");
-    lib.addCSourceFiles(srcs, flags.items);
+    lib.addCSourceFiles(.{
+        .files = srcs,
+        .flags = flags.items,
+    });
 
     switch (target.getOsTag()) {
         .linux => lib.addCSourceFile(.{
@@ -56,9 +59,12 @@ pub fn build(b: *std.Build) !void {
     }
     switch (target.getOsTag()) {
         .windows => {
-            lib.addCSourceFiles(&.{
-                "upstream/builds/windows/ftdebug.c",
-            }, flags.items);
+            lib.addCSourceFiles(.{
+                .files = &.{
+                    "upstream/builds/windows/ftdebug.c",
+                },
+                .flags = flags.items,
+            });
             lib.addWin32ResourceFile(.{
                 .file = .{ .path = "upstream/src/base/ftver.rc" },
             });
